@@ -1,51 +1,13 @@
-import * as RSS from "rss";
 import http = require("http");
 import { Request, Response } from "express";
+import * as RSS from "rss";
 
 import { fetchItems } from "./fetch";
 import { mergeItems, RSSItemOptions } from "./feed";
 
 const log = require("simple-node-logger").createSimpleLogger();
 
-export function createHandler(options: any /*RSS.FeedOptions*/) {
-    let latestXML: string;
-
-    let items: RSSItemOptions[] = [];
-
-    async function updateRepo() {
-        try {
-            const fetched = await fetchItems();
-            log.info(`fetched ${fetched.length} items`);
-            const newItems = mergeItems(items, fetched);
-
-            // generate RSS xml
-            const feed = new RSS(options);
-            for (const i of newItems) {
-                feed.item(i);
-            }
-            const newXML = feed.xml();
-
-            latestXML = newXML;
-            items = newItems;
-        } catch (e) {
-            log.error(`error in updateRepo`, e);
-        }
-    }
-
-    setInterval(updateRepo, 1800e3);
-    setTimeout(updateRepo);
-
-    return ((req: Request, res: Response) => {
-        if (!latestXML) {
-            res.statusCode = 500;
-            res.end("XML not ready");
-        } else {
-            res.end(latestXML);
-        }
-    });
-}
-
-async function createFeedServer(port: number) {
+export function createFeedHandler() {
 
     let latestXML: string;
 
@@ -83,20 +45,12 @@ async function createFeedServer(port: number) {
     setInterval(updateRepo, 1800e3);
     setTimeout(updateRepo);
 
-    const server = http.createServer((req, res) => {
+    return (req: Request, res: Response) => {
         if (!latestXML) {
             res.statusCode = 500;
             res.end("XML not prepared");
         } else {
             res.end(latestXML);
         }
-    });
-
-    server.listen(port);
-}
-
-export function main(port: number) {
-    createFeedServer(port)
-        .then(() => log.info(`server created at port ${port}`))
-        .catch((e) => log.error("error creating server", e));
+    };
 }
