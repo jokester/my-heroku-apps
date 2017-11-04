@@ -8,7 +8,10 @@
  */
 import * as path from "path";
 import * as express from "express";
-import { fooAsync } from "./server/foo";
+
+import { createFeedHandler } from "./server";
+
+const port = process.env.PORT || 5000;
 
 const app = express();
 
@@ -55,8 +58,10 @@ if (process.env.NODE_ENV !== "production") {
 
 app.use(express.static(path.join(__dirname, "../public")));
 
-app.listen(9000, () => {
+app.get("/rss/toutiao.io.xml", createFeedHandler());
+
+app.listen(port, () => {
     console.log("##################################");
-    console.log("#### dev-server started listening on http://localhost:9000 ");
+    console.log(`#### server started listening on http://localhost:${port} `);
     console.log("##################################");
 });
