@@ -42,6 +42,7 @@ export class PlatoConnection {
 
                     this.events.onConnectStatusChanged(false,
                         this.connectionAlive = true);
+                    fulfill();
                     // this.testServer();
                 };
 
@@ -74,7 +75,7 @@ export class PlatoConnection {
         if (res && res.type === MessageType.Register && res.succeeded) {
             return;
         }
-        throw new Error("error registering nickname");
+        throw new Error(`error registering nickname`);
     }
 
     async joinChannel(channelName: string): Promise<void> {
@@ -133,11 +134,8 @@ export class PlatoConnection {
     }
 
     private onNotHandledServerMessage(m: ServerMessage) {
-        switch (m.type) {
-            case MessageType.SyncChat: {
-                // TODO
-                break;
-            }
+        if (m.type === MessageType.SyncChat) {
+            this.events.onNewMessage(null, m.messages);
         }
     }
 

@@ -25,6 +25,7 @@ export interface ChatEntry {
     channelName: string;
     by: string;
     sentAt: number;
+    text: string;
 }
 
 // base type for discriminated union type
