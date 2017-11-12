@@ -1,13 +1,14 @@
 /**
  * State
  */
-import { ClientMessage, ServerMessage, MessageType, ChatItem } from "./messages";
+import { ClientMessage, ServerMessage, MessageType, ChatEntry } from "./messages";
 
 let messageSeq = 0x8000;
-const wssURL = `${location.origin.replace(/^http/, "ws")}/plato`;
+const wssURL = `${location.origin.replace(/* http > ws, https > wss */ /^http/, "ws")}/plato`;
 
-export interface ChannelSubscriber {
-    onHistoryUpdated(channelName: string, chatHistory: ChatItem[]): void;
+export interface ConnectionEventHandler {
+    onConnectStatusChanged(establishing: boolean, connected: boolean): void;
+    onNewMessage(channelName: string, messages: ChatEntry[]): void;
 }
 
 export class PlatoConnection {
@@ -16,35 +17,50 @@ export class PlatoConnection {
         = new Map<number, { fulfill: Function, reject: Function }>();
 
     private readonly chatHistory
-        = new Map<string, ChatItem[]>();
+        = new Map<string, ChatEntry[]>();
 
-    private readonly socket: WebSocket;
+    private socket: WebSocket;
 
     private connectionAlive = false;
 
-    constructor(readonly subscriber: ChannelSubscriber) {
-        const socket = this.socket = new WebSocket(wssURL);
-        socket.onopen = () => {
-            console.info("websocket connected");
-            this.connectionAlive = true;
-            this.sendMessage({
-                type: MessageType.PingPong,
+    private startedConnection: Promise<void>;
+
+    constructor(private readonly events: ConnectionEventHandler) { }
+
+    startConnect() {
+        if (!this.startedConnection) {
+            this.startedConnection = new Promise<void>((fulfill, reject) => {
+                this.events.onConnectStatusChanged(true, false);
+
+                const socket = this.socket = new WebSocket(wssURL);
+                socket.onopen = () => {
+                    console.info("websocket connected");
+                    this.connectionAlive = true;
+                    this.sendMessage({
+                        type: MessageType.PingPong,
+                    });
+
+                    this.events.onConnectStatusChanged(false,
+                        this.connectionAlive = true);
+                    // this.testServer();
+                };
+
+                socket.onclose = () => {
+                    console.info("websocket disconnected");
+                    this.events.onConnectStatusChanged(false,
+                        this.connectionAlive = false);
+                };
+
+                socket.onerror = (ev) => {
+                    console.info("websocket error", ev);
+                    this.events.onConnectStatusChanged(false,
+                        this.connectionAlive = false);
+                };
+
+                socket.onmessage = this.onSocketMessage;
             });
-
-            this.testServer();
-        };
-
-        socket.onclose = () => {
-            console.info("websocket disconnected");
-            this.connectionAlive = true;
-        };
-
-        socket.onerror = (ev) => {
-            console.info("websocket error", ev);
-            this.connectionAlive = false;
-        };
-
-        socket.onmessage = this.onSocketMessage;
+        }
+        return this.startedConnection;
     }
 
     async register(nickname: string): Promise<void> {

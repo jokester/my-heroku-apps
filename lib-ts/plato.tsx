@@ -7,7 +7,12 @@
 import { React, ReactDOM } from "./browser/fake-react";
 import { webpack_dev, haveHMR, } from "./browser/webpack-hmr";
 
+import { useStrict as mobxUseStrict, autorunAsync } from "mobx";
+
 import { PlatoApp } from "./plato/browser";
+import { AppState } from "./plato/state";
+
+mobxUseStrict(true);
 
 if (webpack_dev && haveHMR(module)) {
     // dev w/ HMR: hot-reload './m' and create <li> from it
@@ -21,8 +26,12 @@ if (webpack_dev && haveHMR(module)) {
     console.info("webpack HMR not available");
 } /* else do nothing in production */
 
-renderRoot();
+const appState = new AppState();
+
+autorunAsync(renderRoot);
 
 function renderRoot() {
-    ReactDOM.render(<PlatoApp />, document.body.firstElementChild);
+    ReactDOM.render(
+        <PlatoApp appState={appState} />,
+        document.querySelector("#react-render-root"));
 }

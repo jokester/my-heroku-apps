@@ -21,7 +21,7 @@ export const enum MessageType {
     PingPong = "PingPong",
 }
 
-export interface ChatItem {
+export interface ChatEntry {
     channelName: string;
     by: string;
     sentAt: number;
@@ -96,7 +96,7 @@ export namespace _ServerMessage {
     interface SyncChat {
         seq?: undefined;
         type: MessageType.SyncChat;
-        messages: ChatItem[];
+        messages: ChatEntry[];
     }
 }
 
