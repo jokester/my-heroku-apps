@@ -8,9 +8,11 @@
  */
 import * as path from "path";
 import * as express from "express";
+import * as http from "http";
 import { getLogger, initConnections } from "./server";
 
-import { createFeedHandler } from "./server";
+import { attachHandler as attachToutiaoRSS } from "./toutiao-rss";
+import { attachHandler as attachPlato } from "./plato/server";
 
 async function main() {
 
@@ -19,7 +21,12 @@ async function main() {
     const port = process.env.PORT || 5000;
 
     const app = express();
+    const server = http.createServer(app);
     const logger = getLogger();
+
+    attachPlato(server);
+
+    attachToutiaoRSS(app);
 
     if (process.env.NODE_ENV !== "production") {
         /**
@@ -66,11 +73,9 @@ async function main() {
 
     app.use(express.static(path.join(__dirname, "../public")));
 
-    // app.get("/rss/toutiao.io.xml", createFeedHandler());
-
     await connectionsInited;
 
-    app.listen(port, () => {
+    server.listen(port, () => {
         logger.info("##################################");
         logger.info(`#### server started listening on http://localhost:${port} `);
         logger.info("##################################");

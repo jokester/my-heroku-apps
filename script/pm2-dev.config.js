@@ -15,7 +15,7 @@ module.exports = {
       name: "heroku-app",
       script: path.join(repoRoot, "lib-ts/server-main.ts"),
       // NOTE: ts-node-dev fails for no reason, using ts-node
-      interpreter: path.join(repoRoot, "node_modules/.bin/ts-node-dev"),
+      interpreter: path.join(repoRoot, "node_modules/.bin/ts-node"),
       /** NOTE: can't get watch to work with ts-node. Using ts-node-dev to handle watch and restart stuff */
       // watch     : [
       //   path.join(repoRoot, "lib-ts/**/*"),

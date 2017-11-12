@@ -10,9 +10,12 @@ export const enum LogLevel {
 }
 
 const cachedLoggers = new Map<LogLevel, winston.LoggerInstance>();
+
+const defaultLogLevel = (process.env.NODE_ENV === "production") ? LogLevel.info : LogLevel.debug;
+
 /**
  */
-export function getLogger(level = LogLevel.info) {
+export function getLogger(level = defaultLogLevel) {
     if (cachedLoggers.has(level)) {
         return cachedLoggers.get(level);
     }

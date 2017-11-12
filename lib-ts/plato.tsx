@@ -7,7 +7,7 @@
 import { React, ReactDOM } from "./browser/fake-react";
 import { webpack_dev, haveHMR, } from "./browser/webpack-hmr";
 
-import { AppRoot } from "./plato-browser";
+import { PlatoApp } from "./plato/browser";
 
 if (webpack_dev && haveHMR(module)) {
     // dev w/ HMR: hot-reload './m' and create <li> from it
@@ -24,5 +24,5 @@ if (webpack_dev && haveHMR(module)) {
 renderRoot();
 
 function renderRoot() {
-    ReactDOM.render(<AppRoot />, document.body.firstElementChild);
+    ReactDOM.render(<PlatoApp />, document.body.firstElementChild);
 }
