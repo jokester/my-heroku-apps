@@ -14,9 +14,9 @@ module.exports = {
     },
   },
   entry: {
-    "browser-entrypoint": [
-      "core-js/client/shim",
-      path.join(__dirname, "..", "lib-ts", "browser-entrypoint.tsx"),
+    "plato": [
+      // "core-js/client/shim",
+      path.join(__dirname, "..", "lib-ts", "plato.tsx"),
     ],
   },
   output: {

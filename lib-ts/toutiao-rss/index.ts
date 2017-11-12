@@ -1,13 +1,14 @@
 import http = require("http");
-import { Request, Response } from "express";
+import { Request, Response, Express } from "express";
 import * as RSS from "rss";
 
 import { fetchItems } from "./fetch";
 import { mergeItems, RSSItemOptions } from "./feed";
+import { getLogger } from "../server/log";
 
-const log = require("simple-node-logger").createSimpleLogger();
+const log = getLogger();
 
-export function createFeedHandler() {
+function createFeedHandler() {
 
     let latestXML: string;
 
@@ -25,8 +26,8 @@ export function createFeedHandler() {
                 description: "toutiao.io的非官方RSS repo",
                 generator: "", //
                 site_url: "https://toutiao.io",
-                feed_url: "https://toutiao-rss.jokester.io",
-                docs: "https://github.com/jokester/toutiao-rss",
+                feed_url: "https://jokester-apps.herokuapp.com/rss/toutiao.io.xml",
+                docs: "https://github.com/jokester/my-heroku-apps",
                 webMaster: "me@jokester.io",
                 language: "zh",
             });
@@ -53,4 +54,9 @@ export function createFeedHandler() {
             res.end(latestXML);
         }
     };
+}
+
+export function attachHandler(app: Express, path = "/rss/toutiao.io.xml") {
+    app.get(path, createFeedHandler());
+    log.info(`added handler: GET ${path}`);
 }

@@ -19,10 +19,15 @@
         "pretty": true,
         "jsxFactory": "React.createElement",
         "module": "commonjs",
-        "importHelpers": true
+        "importHelpers": true,
+        "typeRoots": [
+            "lib-ts/vendor/",
+            "node_modules/@types"
+        ]
     },
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "lib-ts/**/*.tsx"
     ],
     "compileOnSave": false,
     "atom": {
