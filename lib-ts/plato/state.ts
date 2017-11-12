@@ -3,7 +3,7 @@
  */
 import { observable, action, computed } from "mobx";
 import { PlatoConnection } from "./connection";
-import { observer } from "mobx-observer";
+import { observer, setComponent } from "mobx-observer";
 
 interface StateModifier<T> {
     (state: T): void;

@@ -8,11 +8,13 @@ import { React, ReactDOM } from "./browser/fake-react";
 import { webpack_dev, haveHMR, } from "./browser/webpack-hmr";
 
 import { useStrict as mobxUseStrict, autorunAsync } from "mobx";
+import { setComponent } from "mobx-observer";
 
 import { PlatoApp } from "./plato/browser";
 import { AppState } from "./plato/state";
 
 mobxUseStrict(true);
+setComponent(React.Component as any);
 
 if (webpack_dev && haveHMR(module)) {
     // dev w/ HMR: hot-reload './m' and create <li> from it
