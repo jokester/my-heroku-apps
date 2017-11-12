@@ -9,8 +9,12 @@
 /public/static/
 /public/stats.html
 
+# dist
+/dist
+
 # misc
 /tmp
+/temp
 .DS_Store
 .env.local
 .env.development.local

@@ -4,8 +4,9 @@ import * as RSS from "rss";
 
 import { fetchItems } from "./fetch";
 import { mergeItems, RSSItemOptions } from "./feed";
+import { getLogger } from "../log";
 
-const log = require("simple-node-logger").createSimpleLogger();
+const log = getLogger();
 
 export function createFeedHandler() {
 

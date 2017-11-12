@@ -69,6 +69,7 @@ export function mergeItems(existing: RSSItemOptions[], fetched: ToutiaoItem[]): 
 
     const merged = existing.slice(0);
 
+    // FIXME: should use map
     const existing_urls = {} as { [url: string]: string };
     for (const e of existing) {
         existing_urls[e.url] = e.url;
@@ -81,7 +82,7 @@ export function mergeItems(existing: RSSItemOptions[], fetched: ToutiaoItem[]): 
             title: i.title,
             description: i.metadata,
             url: i.url,
-            // 以加入列表的时间为
+            // 以加入列表的时间为rss entry的时间
             date: new Date(),
             guid: UUID.v3({ namespace: UUID.namespace.url, name: i.url })
         });

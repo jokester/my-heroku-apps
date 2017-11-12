@@ -1,0 +1,1 @@
+export { React, ReactDOM } from "./fake-react";

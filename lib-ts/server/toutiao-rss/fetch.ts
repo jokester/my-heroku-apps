@@ -18,7 +18,7 @@ function getTextNodes(parent: CheerioElement) {
 const fullURL = /^(https?|ftp):\/\//;
 
 /**
- * 将toutiao.io首
+ * 解析toutiao.io首页的html
  */
 export function parseItems(toutiaoPage: string): ToutiaoItem[] {
     const context = cheerio.load(toutiaoPage);
