@@ -92,6 +92,8 @@ export class AppState {
 
         try {
             await this.conn.register(nick);
+
+            await wait(5e3);
             this.mutateState(s => {
                 s.started = true;
                 s.nick = nick;
@@ -136,3 +138,5 @@ function transformComponent<PropKey extends string, Store, Prop extends PropKVPa
 type PropKVPair<PropKey extends string, Store> = {
     [k in PropKey]: Store;
 };
+
+const wait = (delay: number) => new Promise<void>(fulfill => setTimeout(fulfill, delay));
