@@ -72,6 +72,11 @@ export class AppState {
         },
     });
 
+    constructor() {
+        setTimeout(() =>
+            this.conn.startConnect(), 5e3);
+    }
+
     @action
     mutateState(mutator: StateMutator<UiState>) {
         mutator(this.uiState);
@@ -83,9 +88,8 @@ export class AppState {
             return;
         }
 
-        this.uiState.starting = true;
+        this.mutateState(s => s.starting = true);
 
-        await this.conn.startConnect();
         try {
             await this.conn.register(nick);
             this.mutateState(s => {

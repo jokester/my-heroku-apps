@@ -11,8 +11,7 @@ import * as React from "react";
 import { useStrict as mobxUseStrict, autorunAsync } from "mobx";
 import { Provider } from "mobx-react";
 
-import { PlatoApp } from "./plato/browser";
-import { AppState } from "./plato/state";
+import { PlatoApp, AppState } from "./plato/index";
 
 mobxUseStrict(true);
 
