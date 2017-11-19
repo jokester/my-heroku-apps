@@ -1,14 +1,16 @@
 /**
- * server-main.ts: entrypoint of node.js http server
+ * server-main.ts: init and start a http / ws server
  *
- * - create a express.js http server
+ * - serves http
+ * - serves websocket
  * - serves static asset in public/
- * - serves webpack dev bundle (only in dev)
- * - can also be a startpoint of a whole web server
+ * - (DEV only) serves webpack dev bundle
  */
+import * as http from "http";
 import * as path from "path";
 import * as express from "express";
-import * as http from "http";
+import "reflect-metadata"; // needed by typeorm
+
 import { getLogger, initConnections } from "./server";
 
 import { attachHandler as attachToutiaoRSS } from "./toutiao-rss";
@@ -80,7 +82,9 @@ async function main() {
         logger.info(`#### server started listening on http://localhost:${port} `);
         logger.info("##################################");
     });
-
 }
 
-main();
+main().catch(e => {
+    console.error(e);
+    process.exit(1);
+});

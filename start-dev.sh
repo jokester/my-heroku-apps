@@ -5,7 +5,6 @@ cd "$(dirname "$0")"
 
 RUN_LOCK="$PWD/temp/running-dev.lock"
 export PGDATA="$PWD/temp/pgdata.dev"
-DATABASE_NAME="plato"
 
 ensure-deps () {
   echo "checking for dependcies"

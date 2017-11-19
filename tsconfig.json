@@ -17,7 +17,6 @@
         "emitDecoratorMetadata": true,
         "jsx": "react",
         "pretty": true,
-        "jsxFactory": "React.createElement",
         "module": "commonjs",
         "importHelpers": true,
         "typeRoots": [

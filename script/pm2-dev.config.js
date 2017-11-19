@@ -1,6 +1,9 @@
 const path = require("path");
 const repoRoot = path.join(__dirname, "..");
 
+const PGSQL_SOCKET = path.join(repoRoot, "temp/.s.PGSQL.5432");
+const REDIS_SOCKET = path.join(repoRoot, "temp/redis.dev/redis.socket");
+
 /**
  * a pm2 config for all processes needed in dev
  */
