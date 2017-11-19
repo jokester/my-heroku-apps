@@ -1,12 +1,14 @@
 /**
  * State manage with mobx
  */
-import { observable, action, computed } from "mobx";
+import { observable, action, computed, } from "mobx";
 import { PlatoConnection } from "./connection";
-import { observer, setComponent, } from "mobx-observer";
 import { ChatEntry } from "./messages";
+import * as React from "react";
+import { observer, inject, Provider, IReactComponent } from "mobx-react";
+import { webpack_dev } from "../browser";
 
-interface StateModifier<T> {
+interface StateMutator<T> {
     (state: T): void;
 }
 
@@ -14,95 +16,119 @@ export interface AppStateProps {
     appState: AppState;
 }
 
-function mutate(f: Function) {
-    (action(f))();
-}
+interface UiState {
+    /** automatically reconnects under the hood */
+    wssConnected: boolean;
 
-interface StateForUI {
-    connecting: boolean;
-    connected: boolean;
-
-    nick: string;
+    /** nick is trht */
+    started: boolean;
     starting: boolean;
+    nick: string;
+    lastJoinError: string;
 
-    activeChannel: string;
-    messages: ChatEntry[];
+    currentChannelName: string;
+    chatHistory: Map<string, ChatEntry[]>;
+    chatDraft: Map<string, string>;
 }
 
 export class AppState {
 
     @computed
-    get isBusy() {
-        return this.stateForUi.connecting || this.stateForUi.starting;
+    get shouldDisableUI() {
+        return !this.uiState.wssConnected;
     }
 
     @observable
-    stateForUi: StateForUI = {
-        /**
-         * before connect
-         */
-        connecting: false,
-        connected: false,
+    uiState: UiState = {
+        wssConnected: false,
 
         /**
          * right before start chat
          */
+        started: false,
         starting: false,
         nick: null,
+        lastJoinError: null,
 
         /**
          * during chat
          */
-        activeChannel: null,
-        messages: [],
+        currentChannelName: null,
+        chatHistory: new Map(),
+        chatDraft: new Map(),
     };
 
     private readonly conn = new PlatoConnection({
         onConnectStatusChanged: (establishing, connected) => {
-            this.mutateState(() => {
-                this.stateForUi.connecting = establishing;
-                this.stateForUi.connected = connected;
+            this.mutateState(s => {
+                s.wssConnected = connected;
             });
         },
         onNewMessage: (channelName, messages) => {
-            this.mutateState(() => {
-                this.stateForUi.messages.push(...messages);
+            this.mutateState(s => {
+                s.chatHistory.set(channelName,
+                    (s.chatHistory.get(channelName) || []).concat(messages));
             });
-        }
+        },
     });
 
     @action
-    mutateState(mutator: () => void) {
-        mutator();
+    mutateState(mutator: StateMutator<UiState>) {
+        mutator(this.uiState);
     }
 
     async start(nick: string) {
+        if (this.uiState.started || this.uiState.starting || !nick) {
+            // should not be here
+            return;
+        }
+
+        this.uiState.starting = true;
+
         await this.conn.startConnect();
         try {
-            this.mutateState(() => {
-                this.stateForUi.starting = true;
-            });
             await this.conn.register(nick);
-            this.mutateState(() => {
-                this.stateForUi.nick = nick;
+            this.mutateState(s => {
+                s.started = true;
+                s.nick = nick;
+                s.starting = false;
             });
         } finally {
-            this.mutateState(() => {
-                this.stateForUi.starting = false;
+            this.mutateState(s => {
+                s.starting = false;
             });
         }
     }
 
     async join(channelName: string) {
-        await this.conn.joinChannel(channelName);
-        this.mutateState(() => {
-            this.stateForUi.activeChannel = channelName;
-        });
+        this.conn.joinChannel(channelName);
     }
 
     async send(channelName: string, text: string) {
         await this.conn.sendChat(channelName, text);
     }
-
-
 }
+
+export function bindState(name: string, pureComponent: IReactComponent<AppStateProps>) {
+    return transformComponent<"appState", AppState, AppStateProps>(name, pureComponent);
+}
+
+/**
+ * converts a pure react component
+ * to a stateful component that only depends on mobx state
+*/
+function transformComponent<PropKey extends string, Store, Prop extends PropKVPair<PropKey, Store>>(
+    name: string, pureComponent: IReactComponent<Prop>) {
+
+
+    if (webpack_dev) {
+        // dev build: assign name to new
+        (pureComponent as any).__debug_name = name;
+    }
+
+    return inject("appState")(observer(pureComponent)) as IReactComponent<{}>;
+}
+
+type PropKVPair<PropKey extends string, Store> = {
+    [k in PropKey]: Store;
+};

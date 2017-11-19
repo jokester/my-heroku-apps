@@ -1,1 +1,1 @@
-export { React, ReactDOM } from "./fake-react";
+export { webpack_dev } from "./webpack-hmr";
