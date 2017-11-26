@@ -83,6 +83,7 @@ export namespace _ServerMessage {
     interface Join extends BaseMessage {
         type: MessageType.Join;
         succeeded: boolean;
+        existingMessages?: ChatEntry[];
     }
 
     interface Leave extends BaseMessage {

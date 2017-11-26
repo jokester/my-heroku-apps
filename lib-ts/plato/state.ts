@@ -27,6 +27,7 @@ interface UiState {
     lastJoinError: string;
 
     currentChannelName: string;
+    channelNameDraft: string;
     chatHistory: Map<string, ChatEntry[]>;
     chatDraft: Map<string, string>;
 }
@@ -53,7 +54,8 @@ export class AppState {
         /**
          * during chat
          */
-        currentChannelName: null,
+        currentChannelName: "",
+        channelNameDraft: "",
         chatHistory: new Map(),
         chatDraft: new Map(),
     };
@@ -74,7 +76,7 @@ export class AppState {
 
     constructor() {
         setTimeout(() =>
-            this.conn.startConnect(), 5e3);
+            this.conn.startConnect(), 1e3);
     }
 
     @action
@@ -93,7 +95,9 @@ export class AppState {
         try {
             await this.conn.register(nick);
 
-            await wait(5e3);
+            // let user see the progress
+            await wait(1e3);
+
             this.mutateState(s => {
                 s.started = true;
                 s.nick = nick;
@@ -115,8 +119,12 @@ export class AppState {
     }
 }
 
-export function bindState(name: string, pureComponent: IReactComponent<AppStateProps>) {
-    return transformComponent<"appState", AppState, AppStateProps>(name, pureComponent);
+export function bindAllState(name: string, pureComponent: IReactComponent<AppStateProps>) {
+    return bindState<{}>(name, pureComponent);
+}
+
+export function bindState<DirectProps = {}>(name: string, pureComponent: IReactComponent<AppStateProps & DirectProps>) {
+    return transformComponent<"appState", AppState, AppStateProps>(name, pureComponent) as IReactComponent<DirectProps>;
 }
 
 /**

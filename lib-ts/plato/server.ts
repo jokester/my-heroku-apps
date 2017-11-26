@@ -189,6 +189,7 @@ namespace Chat {
             type: MessageType.Join,
             seq: msg.seq,
             succeeded: !reason,
+            existingMessages: [/* TODO: sync */]
         });
     }
 

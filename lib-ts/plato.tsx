@@ -18,7 +18,7 @@ mobxUseStrict(true);
 if (webpack_dev && haveHMR(module)) {
     // dev w/ HMR: hot-reload root app
     console.info("configuring webpack HMR");
-    module.hot.accept("./browser", function () {
+    module.hot.accept("./plato/index", function () {
         console.log("accept handler get called", [].slice.call(arguments));
         renderRoot();
     });

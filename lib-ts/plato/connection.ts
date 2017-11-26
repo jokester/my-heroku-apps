@@ -87,6 +87,7 @@ export class PlatoConnection {
 
         const res = await this.waitReply(req);
         if (res.type === MessageType.Join && res.succeeded) {
+            this.events.onNewMessage(channelName, res.existingMessages || []);
             return;
         }
         throw new Error("error joining channel");
