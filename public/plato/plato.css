@@ -23,3 +23,15 @@
 #react-render-root {
     height: 100vh;
 }
+
+@media (min-width: 600px) {
+    .before-start {
+        width: 480px;
+    }
+}
+
+@media (min-width: 900px) {
+    .before-start {
+        width: 720px;
+    }
+}

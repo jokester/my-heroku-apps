@@ -41,7 +41,7 @@ const BeforeStart = bindAllState("BeforeStart", ({ appState }: AppStateProps) =>
 
     const nickInput = canInputName && <Input.Search placeholder="nickname" size="large" enterButton />;
     return <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <div style={{ maxWidth: 640 }}>
+        <div className="before-start" >
             <Steps >{steps}</Steps>
             <NickInput />
         </div>
