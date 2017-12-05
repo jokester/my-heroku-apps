@@ -40,9 +40,11 @@ const BeforeStart = bindAllState("BeforeStart", ({ appState }: AppStateProps) =>
     ];
 
     const nickInput = canInputName && <Input.Search placeholder="nickname" size="large" enterButton />;
-    return <div className="v-center">
-        <Steps >{steps}</Steps>
-        <NickInput />
+    return <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <div style={{ maxWidth: 640 }}>
+            <Steps >{steps}</Steps>
+            <NickInput />
+        </div>
     </div>;
 });
 
@@ -66,7 +68,7 @@ const NickInput = bindAllState("NickInput", ({ appState }: AppStateProps) => {
 const Started = bindAllState("Started", ({ appState }: AppStateProps) => {
     const { uiState } = appState;
 
-    return <Layout style={{ height: "100vh" }}>
+    return <Layout style={{ height: "100vh", width: "100vw" }}>
         <Sider width="200px" >
             <div className="logo" />
             <Menu theme="dark" mode="inline"
