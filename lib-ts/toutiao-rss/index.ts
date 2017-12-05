@@ -1,4 +1,4 @@
-import http = require("http");
+import * as http from "http";
 import { Request, Response, Express } from "express";
 import * as RSS from "rss";
 

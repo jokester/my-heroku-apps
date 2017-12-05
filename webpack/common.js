@@ -8,10 +8,6 @@ const Visualizer = require("webpack-visualizer-plugin");
 module.exports = {
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".jsx"],
-    alias: {
-      'react': 'preact-compat',
-      'react-dom': 'preact-compat',
-    },
   },
   entry: {
     "plato": [

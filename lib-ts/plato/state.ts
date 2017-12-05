@@ -42,7 +42,6 @@ const dummyChatHistory: ChatEntry[] = [
         sentAt: Date.now(),
         by: "sender",
         text: "tttext\nmultiline",
-        channelName: "dummy",
     }
 ];
 
