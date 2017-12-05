@@ -16,9 +16,14 @@ export interface AppStateProps {
     appState: AppState;
 }
 
+// a name that wont clash with real channel names
+export const $CreateChannel = "        createChannel";
+
 interface UiState {
     /** automatically reconnects under the hood */
     wssConnected: boolean;
+
+    leftCollapsed: boolean;
 
     /** nick is trht */
     started: boolean;
@@ -32,7 +37,27 @@ interface UiState {
     chatDraft: Map<string, string>;
 }
 
+const dummyChatHistory: ChatEntry[] = [
+    {
+        sentAt: Date.now(),
+        by: "sender",
+        text: "tttext\nmultiline",
+        channelName: "dummy",
+    }
+];
+
 export class AppState {
+
+    @computed
+    get currentChannelDraft() {
+        return this.uiState.chatDraft.get(this.uiState.currentChannelName) || "";
+    }
+
+    @computed
+    get currentChannelHistory() {
+        // if (1) return dummyChatHistory;
+        return this.uiState.chatHistory.get(this.uiState.currentChannelName) || [];
+    }
 
     @computed
     get shouldDisableUI() {
@@ -42,6 +67,8 @@ export class AppState {
     @observable
     uiState: UiState = {
         wssConnected: false,
+
+        leftCollapsed: false,
 
         /**
          * right before start chat
@@ -54,7 +81,7 @@ export class AppState {
         /**
          * during chat
          */
-        currentChannelName: "",
+        currentChannelName: $CreateChannel,
         channelNameDraft: "",
         chatHistory: new Map(),
         chatDraft: new Map(),
@@ -67,6 +94,7 @@ export class AppState {
             });
         },
         onNewMessage: (channelName, messages) => {
+            console.log("onNewMessage", channelName, messages);
             this.mutateState(s => {
                 s.chatHistory.set(channelName,
                     (s.chatHistory.get(channelName) || []).concat(messages));
@@ -82,6 +110,10 @@ export class AppState {
     @action
     mutateState(mutator: StateMutator<UiState>) {
         mutator(this.uiState);
+    }
+
+    setChatDraft(channelName: string, text: string) {
+        this.mutateState(s => s.chatDraft.set(channelName, text));
     }
 
     async start(nick: string) {
@@ -111,7 +143,12 @@ export class AppState {
     }
 
     async join(channelName: string) {
-        this.conn.joinChannel(channelName);
+        await this.conn.joinChannel(channelName);
+
+        // highlight new channel
+        if (this.uiState.currentChannelName === $CreateChannel) {
+            this.mutateState(s => s.currentChannelName = channelName);
+        }
     }
 
     async send(channelName: string, text: string) {

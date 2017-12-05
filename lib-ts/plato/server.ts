@@ -242,8 +242,8 @@ namespace Chat {
                 for (const s of subscribers) {
                     sendMessage(s, {
                         type: MessageType.SyncChat,
+                        channelName: msg.channelName,
                         messages: [{
-                            channelName: msg.channelName,
                             by: nick,
                             sentAt,
                             text: msg.text,

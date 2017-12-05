@@ -1,3 +1,19 @@
-#plato-app {
-    height: 100vh;
+.chat-history-item {
+    /* margin: 8px; */
+    padding: 8px;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.chat-history-text {
+    margin: 0px;
+}
+
+.chat-history-item>hr {
+    border: 1px solid #CCC;
+}
+
+.chat-history-author {
+    background-color: rgba(0, 0, 0, 0.1);
+    margin-right: 16px;
+    padding: 8px;
 }

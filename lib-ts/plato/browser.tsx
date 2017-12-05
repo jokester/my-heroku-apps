@@ -2,11 +2,12 @@
  * UI of Prato
  */
 import * as React from "react";
-import { AppStateProps, bindState, bindAllState } from "./state";
+import { AppStateProps, bindState, bindAllState, $CreateChannel } from "./state";
 import { ChatEntry } from "./messages";
 import * as antd from "antd";
+import * as moment from "moment";
 
-const { Steps, Icon, Input, Form, Button, Layout, Menu, message } = antd;
+const { Steps, Icon, Input, Form, Button, Layout, Menu, List, message } = antd;
 const { Header, Sider, Content } = Layout;
 
 export const PlatoApp = bindAllState("PlatoApp", ({ appState }: AppStateProps) => {
@@ -15,8 +16,6 @@ export const PlatoApp = bindAllState("PlatoApp", ({ appState }: AppStateProps) =
     }
     return <Started />;
 });
-
-const createChannel = "        createChannel";
 
 const BeforeStart = bindAllState("BeforeStart", ({ appState }: AppStateProps) => {
 
@@ -68,25 +67,76 @@ const Started = bindAllState("Started", ({ appState }: AppStateProps) => {
     const { uiState } = appState;
 
     return <Layout style={{ height: "100vh" }}>
-        <Sider width="200px">
+        <Sider width="200px" >
             <div className="logo" />
-            <Menu theme="dark" mode="inline" defaultSelectedKeys={[createChannel]} >
+            <Menu theme="dark" mode="inline"
+                selectedKeys={[uiState.currentChannelName]}
+                onClick={(param) => appState.mutateState(s => s.currentChannelName = param.key)} >
                 {
                     Array.from(uiState.chatHistory.keys()).map(channelName =>
-                        <Menu.Item key={channelName} selectedKeys={[]}>
+                        <Menu.Item key={channelName} >
                             <Icon type="team" />
                             <span>{channelName}</span>
                         </Menu.Item>)
                 }
-                < Menu.Item key={createChannel} >
+                <Menu.Item key={$CreateChannel} >
                     <Icon type="plus" />
                     <NewChannelInput />
                 </Menu.Item>
             </Menu>
         </Sider>
+        <Content style={{ display: "flex", flexDirection: "column", padding: 16 }} >
+            <ChatHistory />
+            <ChatDraft />
+        </Content>
     </Layout >;
 });
 
+const ChatDraft = bindAllState("ChatDraft", ({ appState }: AppStateProps) => {
+    const { uiState } = appState;
+    const { currentChannelName, chatDraft } = uiState;
+
+    if (!currentChannelName || uiState.currentChannelName === $CreateChannel)
+        return null;
+
+    const submit = async () => {
+        const c = currentChannelName;
+        await appState.send(currentChannelName, chatDraft.get(currentChannelName));
+        appState.mutateState(s => s.chatDraft.set(c, ""));
+    };
+
+    console.log("ChatDraft", currentChannelName);
+
+    const draft = appState.currentChannelDraft;
+    return <div style={{ position: "relative" }}>
+        <Input.TextArea rows={3} onPressEnter={ev => ev.target} autosize={false}
+            value={chatDraft.get(currentChannelName)}
+            onChange={ev => appState.setChatDraft(currentChannelName, ev.target.value)}
+        />
+        <Button type="primary" style={{ position: "absolute", right: 0, bottom: 0 }} onClick={submit}>Send</Button>
+    </div>;
+});
+
+const ChatHistory = bindAllState("Started", ({ appState }: AppStateProps) => {
+    const { uiState } = appState;
+
+    if (!uiState.currentChannelName || uiState.currentChannelName === $CreateChannel)
+        return null;
+
+    const history = appState.currentChannelHistory;
+
+    return <div style={{ overflowY: "scroll", flexGrow: 1 }} >
+        {
+            history.map((h, i) =>
+                <div className="chat-history-item">
+                    <span className="chat-history-author">{h.by}</span>
+                    <span className="chat-history-date">{moment(h.sentAt).fromNow()}</span>
+                    <hr />
+                    <pre className="chat-history-text">{h.text}</pre>
+                </div>)
+        }
+    </div>;
+});
 
 const NewChannelInput = bindAllState("NewChannelMenu", ({ appState }: AppStateProps) => {
     const { uiState } = appState;

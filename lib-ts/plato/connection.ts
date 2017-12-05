@@ -136,7 +136,7 @@ export class PlatoConnection {
 
     private onNotHandledServerMessage(m: ServerMessage) {
         if (m.type === MessageType.SyncChat) {
-            this.events.onNewMessage(null, m.messages);
+            this.events.onNewMessage(m.channelName, m.messages);
         }
     }
 
