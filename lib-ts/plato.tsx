@@ -4,20 +4,21 @@
  *  (browser entrypoint)
  */
 
-import { React, ReactDOM } from "./browser/fake-react";
 import { webpack_dev, haveHMR, } from "./browser/webpack-hmr";
+import * as ReactDOM from "react-dom";
+import * as React from "react";
 
 import { useStrict as mobxUseStrict, autorunAsync } from "mobx";
+import { Provider } from "mobx-react";
 
-import { PlatoApp } from "./plato/browser";
-import { AppState } from "./plato/state";
+import { PlatoApp, AppState } from "./plato/index";
 
 mobxUseStrict(true);
 
 if (webpack_dev && haveHMR(module)) {
-    // dev w/ HMR: hot-reload './m' and create <li> from it
+    // dev w/ HMR: hot-reload root app
     console.info("configuring webpack HMR");
-    module.hot.accept("./browser", function () {
+    module.hot.accept("./plato/index", function () {
         console.log("accept handler get called", [].slice.call(arguments));
         renderRoot();
     });
@@ -32,6 +33,8 @@ renderRoot();
 
 function renderRoot() {
     ReactDOM.render(
-        <PlatoApp appState={appState} />,
+        <Provider appState={appState} >
+            <PlatoApp />
+        </Provider>,
         document.querySelector("#react-render-root"));
 }

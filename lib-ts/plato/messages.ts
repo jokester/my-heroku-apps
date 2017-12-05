@@ -22,7 +22,6 @@ export const enum MessageType {
 }
 
 export interface ChatEntry {
-    channelName: string;
     by: string;
     sentAt: number;
     text: string;
@@ -83,6 +82,7 @@ export namespace _ServerMessage {
     interface Join extends BaseMessage {
         type: MessageType.Join;
         succeeded: boolean;
+        existingMessages?: ChatEntry[];
     }
 
     interface Leave extends BaseMessage {
@@ -97,6 +97,7 @@ export namespace _ServerMessage {
     interface SyncChat {
         seq?: undefined;
         type: MessageType.SyncChat;
+        channelName: string;
         messages: ChatEntry[];
     }
 }

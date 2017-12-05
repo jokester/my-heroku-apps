@@ -87,6 +87,7 @@ export class PlatoConnection {
 
         const res = await this.waitReply(req);
         if (res.type === MessageType.Join && res.succeeded) {
+            this.events.onNewMessage(channelName, res.existingMessages || []);
             return;
         }
         throw new Error("error joining channel");
@@ -135,7 +136,7 @@ export class PlatoConnection {
 
     private onNotHandledServerMessage(m: ServerMessage) {
         if (m.type === MessageType.SyncChat) {
-            this.events.onNewMessage(null, m.messages);
+            this.events.onNewMessage(m.channelName, m.messages);
         }
     }
 

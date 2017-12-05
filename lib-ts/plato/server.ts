@@ -93,7 +93,7 @@ namespace Connections {
 
     function ping() {
         const toDelete: WebSocket[] = [];
-        for (const c of activeConnection.keys()) {
+        for (const c of Array.from(activeConnection.keys())) {
             try {
                 sendMessage(c, { type: MessageType.PingPong });
             } catch (e) {
@@ -189,6 +189,7 @@ namespace Chat {
             type: MessageType.Join,
             seq: msg.seq,
             succeeded: !reason,
+            existingMessages: [/* TODO: sync */]
         });
     }
 
@@ -238,17 +239,17 @@ namespace Chat {
                 fail = "not in that channel";
             } else {
                 const sentAt = new Date().getTime();
-                for (const s of subscribers) {
+                subscribers.forEach(s => {
                     sendMessage(s, {
                         type: MessageType.SyncChat,
+                        channelName: msg.channelName,
                         messages: [{
-                            channelName: msg.channelName,
                             by: nick,
                             sentAt,
                             text: msg.text,
                         }]
                     });
-                }
+                });
                 fail = null;
             }
         }
